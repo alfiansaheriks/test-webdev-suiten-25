@@ -1,16 +1,7 @@
 "use client";
 
+import { Absence } from "@/types/absence";
 import { ColumnDef } from "@tanstack/react-table";
-
-export type Absence = {
-  id: string;
-  date: string;
-  employee_name: string;
-  department: string;
-  clock_out_time: string;
-  total_overtime: string;
-  notes: string;
-};
 
 export const columns: ColumnDef<Absence>[] = [
   {
@@ -22,7 +13,7 @@ export const columns: ColumnDef<Absence>[] = [
     header: "Nama Pegawai",
   },
   {
-    accessorKey: "department",
+    accessorKey: "department_id",
     header: "Bagian",
   },
   {

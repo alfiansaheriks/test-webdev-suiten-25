@@ -3,11 +3,10 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SetPageTitle } from "../../../../components/set-page-title";
 import { ACTION, PAGE, TAB } from "@/constant/app";
-import { useAbsenceStore } from "@/stores/absence-store";
 import { useFormSubmit } from "@/stores/form-submit";
 import { AbsenceInputTable } from "@/app/components/ui/InputTable";
 import { useForm } from "react-hook-form";
-import { Calendar22 } from "@/components/ui/date-picker";
+import { useAbsenceStore } from "@/stores/absence/absenceStore";
 
 type AbsenceFormData = {
   employee_id: string;
@@ -19,8 +18,8 @@ type AbsenceFormData = {
 function AbsenceCreatePage() {
   const router = useRouter();
   const { isSubmitting, setIsSubmitting, setSubmitForm } = useFormSubmit();
-  const { data: storeData, setData } = useAbsenceStore();
-  const [editData, setEditData] = useState(storeData);
+  const { create: createAbsence } = useAbsenceStore();
+  const [editData, setEditData] = useState<any[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
@@ -34,8 +33,6 @@ function AbsenceCreatePage() {
     },
     mode: "onChange",
   });
-
-  const { handleSubmit } = form;
 
   const handleEdit = (id: string, key: string, value: string) => {
     setEditData((prev) =>
@@ -88,17 +85,13 @@ function AbsenceCreatePage() {
       try {
         setIsSubmitting(true);
 
-        // Filter only selected rows with filled data
         const selectedData = editData.filter((item) =>
           selectedIds.has(item.id)
         );
 
-        // Validate that required fields are filled
         const hasInvalidData = selectedData.some(
           (item) =>
-            !item.clock_out_time ||
-            item.total_overtime === "" ||
-            item.notes === ""
+            !item.clock_out_time || item.total_overtime === "" || !item.notes
         );
 
         if (hasInvalidData) {
@@ -111,30 +104,28 @@ function AbsenceCreatePage() {
           return;
         }
 
-        console.log("Submitting absence data:", selectedData);
+        for (const item of selectedData) {
+          await createAbsence({
+            employee_id: item.employee_id,
+            date: item.date || new Date().toISOString().split("T")[0],
+            clock_in_time: item.clock_in_time,
+            clock_out_time: item.clock_out_time,
+            total_overtime: Number(item.total_overtime),
+            notes: item.notes,
+            status: item.status || "present",
+          });
+        }
 
-        // TODO: call API to create absence
-        // const response = await fetch("/api/absences", {
-        //   method: "POST",
-        //   headers: { "Content-Type": "application/json" },
-        //   body: JSON.stringify(selectedData),
-        // });
-
-        // Mock success response
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Save to store and redirect
-        setData(selectedData);
-        router.push("/absence/input-absence");
+        alert("Data kehadiran berhasil disimpan");
+        router.push("/absence");
       } catch (error) {
         console.error("Submit error:", error);
         alert("Gagal menyimpan data");
-        throw error; // Re-throw to let the form handle the error state
       } finally {
         setIsSubmitting(false);
       }
     },
-    [editData, selectedIds, setData, setIsSubmitting, router]
+    [editData, selectedIds, createAbsence, setIsSubmitting, router]
   );
 
   useEffect(() => {
@@ -151,6 +142,7 @@ function AbsenceCreatePage() {
   return (
     <>
       <SetPageTitle title={TAB.ABSENCE} action={ACTION.CREATE} alsoDocument />
+
       <div className="container py-10">
         <h1 className="font-semibold text-xl mb-6">{PAGE.ABSENCE.CREATE}</h1>
         <AbsenceInputTable

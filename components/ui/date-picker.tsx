@@ -12,9 +12,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-export function Calendar22() {
+export function Calendar22({
+  value,
+  onChange,
+}: {
+  value?: Date;
+  onChange?: (date: Date | undefined) => void;
+}) {
   const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<Date | undefined>(undefined);
 
   return (
     <div className="flex flex-col gap-3">
@@ -25,16 +30,16 @@ export function Calendar22() {
             id="date"
             className="w-48 justify-between font-normal"
           >
-            {date ? date.toLocaleDateString() : "Select date"}
+            {value ? value.toLocaleDateString() : "Select date"}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto overflow-hidden p-0" align="start">
           <Calendar
             mode="single"
-            selected={date}
+            selected={value}
             captionLayout="dropdown"
             onSelect={(date) => {
-              setDate(date);
+              onChange?.(date);
               setOpen(false);
             }}
           />

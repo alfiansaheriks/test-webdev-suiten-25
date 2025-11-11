@@ -95,7 +95,6 @@ export function AbsenceInputTable({
 
   return (
     <div className="space-y-4">
-      {/* Search and Filter */}
       {(showSearch || showFilter) && (
         <div className="flex gap-3 mb-6">
           {showSearch && (
@@ -120,7 +119,6 @@ export function AbsenceInputTable({
             </form>
           )}
 
-          {/* Department Filter */}
           {showFilter && (
             <Select
               value={selectedDepartment}
@@ -142,7 +140,6 @@ export function AbsenceInputTable({
         </div>
       )}
 
-      {/* Shadcn Table */}
       <div className="border rounded-lg">
         <Table>
           <TableHeader className="bg-[#F5F8FF]">

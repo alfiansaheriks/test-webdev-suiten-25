@@ -130,7 +130,6 @@ function EditDepartment() {
                 </div>
               </div>
 
-              {/* tombol submit hidden agar enter di form tetap bekerja */}
               <button type="submit" className="hidden" aria-hidden />
             </form>
           </Form>

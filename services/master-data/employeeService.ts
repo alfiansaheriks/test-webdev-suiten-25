@@ -52,3 +52,12 @@ export async function remove(id: string) {
   if (error) throw error;
   return response;
 }
+
+export async function getEmployeeByDepartmentId(departmentIds: string[]) {
+  const { data, error } = await supabaseBrowser
+    .from("employees")
+    .select("*")
+    .contains("department_id", departmentIds);
+  if (error) throw error;
+  return data;
+}

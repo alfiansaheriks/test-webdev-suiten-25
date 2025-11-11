@@ -4,6 +4,7 @@ import {
   update,
   getById as fetchById,
   createEmployee,
+  getEmployeeByDepartmentId,
 } from "@/services/master-data/employeeService";
 import { EmployeeState } from "@/types/employee";
 import { create } from "zustand";
@@ -77,6 +78,18 @@ export const useEmployeeStore = create<EmployeeState>((set) => ({
     set({ loading: true });
     try {
       const response = await fetchById(id);
+      set({ loading: false });
+      return response;
+    } catch (error) {
+      const err = error as Error;
+      set({ error: err.message, loading: false });
+      throw err;
+    }
+  },
+  getByDepartmentId: async (departmentIds: string[]) => {
+    set({ loading: true });
+    try {
+      const response = await getEmployeeByDepartmentId(departmentIds);
       set({ loading: false });
       return response;
     } catch (error) {

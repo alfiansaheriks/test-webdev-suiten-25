@@ -23,6 +23,7 @@ type Props<T extends FieldValues> = {
   label?: string;
   placeholder?: string;
   options: Option[];
+  onChange?: (value: string) => void;
 };
 
 export function FormSelect<T extends FieldValues>({
@@ -31,6 +32,7 @@ export function FormSelect<T extends FieldValues>({
   label,
   placeholder,
   options,
+  onChange,
 }: Props<T>) {
   return (
     <div className="flex w-full gap-2">
@@ -43,7 +45,10 @@ export function FormSelect<T extends FieldValues>({
             <FormControl>
               <Select
                 value={field.value}
-                onValueChange={(val) => field.onChange(val)}
+                onValueChange={(val) => {
+                  field.onChange(val);
+                  onChange?.(val);
+                }}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue

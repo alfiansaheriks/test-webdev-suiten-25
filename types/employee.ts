@@ -27,4 +27,5 @@ export type EmployeeState = {
   remove: (id: string) => Promise<void>;
   update: (employee: Employee) => Promise<void>;
   getById: (id: string) => Promise<Employee>;
+  getByDepartmentId: (departmentIds: string[]) => Promise<Employee[]>;
 };
