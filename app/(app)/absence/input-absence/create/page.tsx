@@ -108,11 +108,10 @@ function AbsenceCreatePage() {
           await createAbsence({
             employee_id: item.employee_id,
             date: item.date || new Date().toISOString().split("T")[0],
-            clock_in_time: item.clock_in_time,
             clock_out_time: item.clock_out_time,
-            total_overtime: Number(item.total_overtime),
+            total_overtime: String(item.total_overtime),
             notes: item.notes,
-            status: item.status || "present",
+            department_id: item.department_id,
           });
         }
 
@@ -148,7 +147,7 @@ function AbsenceCreatePage() {
         <AbsenceInputTable
           data={editData}
           selectedIds={selectedIds}
-          onEdit={handleEdit}
+          // onEdit={handleEdit}
           onCheckboxChange={handleCheckboxChange}
           onSelectAll={handleSelectAll}
           onSearchChange={setSearchTerm}

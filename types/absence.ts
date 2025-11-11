@@ -1,3 +1,5 @@
+import { Employee } from "./employee";
+
 export type Absence = {
   id?: string;
   date: string;
@@ -11,6 +13,7 @@ export type Absence = {
 
 export type AbsenceState = {
   absences: Absence[];
+  employees: Employee[];
   loading: boolean;
   error: string | null;
   fetchAll: (department_id: string, date?: string) => Promise<void>;

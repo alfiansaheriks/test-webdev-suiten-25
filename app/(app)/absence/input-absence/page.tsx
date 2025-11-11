@@ -29,10 +29,8 @@ function AbsencePage() {
     new Date().toISOString().split("T")[0]
   );
 
-  // Merge employees with absences
   useEffect(() => {
     if (storeEmployees.length > 0) {
-      console.log("[AbsencePage] Merging employees with absences");
       const absenceMap = new Map(
         storeAbsences.map((a) => [a.employee_name, a])
       );
@@ -45,8 +43,8 @@ function AbsencePage() {
         return {
           id: `temp-${emp.id}`,
           date: selectedDate,
+          employee_id: emp.id,
           employee_name: emp.employee_name,
-          department: selectedDepartment,
           department_id: selectedDepartment,
           clock_out_time: "",
           total_overtime: "",
@@ -54,21 +52,14 @@ function AbsencePage() {
         };
       });
 
-      console.log("[AbsencePage] Merged data:", mergedData);
       setEditData(mergedData);
     } else {
       setEditData(storeAbsences);
     }
   }, [storeEmployees, storeAbsences, selectedDate, selectedDepartment]);
 
-  // Set default department on first load
   useEffect(() => {
-    console.log("[AbsencePage] Departments loaded:", departments);
     if (departments.length > 0 && !selectedDepartment) {
-      console.log(
-        "[AbsencePage] Setting default department to:",
-        departments[0].id
-      );
       setSelectedDepartment(departments[0].id);
     }
   }, [departments, selectedDepartment]);
@@ -80,23 +71,15 @@ function AbsencePage() {
     mode: "onChange",
   });
 
-  // Update form default when selectedDepartment changes
   useEffect(() => {
     if (selectedDepartment) {
-      console.log(
-        "[AbsencePage] Resetting form with department:",
-        selectedDepartment
-      );
       form.reset({ department: selectedDepartment });
     }
   }, [selectedDepartment, form]);
 
   const { control, watch } = form;
-
-  // 🔁 Fetch data when department or date changes
   const watchDepartment = watch("department");
 
-  // Sync form changes to selectedDepartment
   useEffect(() => {
     if (watchDepartment && watchDepartment !== selectedDepartment) {
       setSelectedDepartment(watchDepartment);
@@ -116,10 +99,8 @@ function AbsencePage() {
   const handleRowEdit = (id: string | number) => {
     if (id === "save") {
       const row = editData.find((r) => r.id === editingId);
-      console.log("Ini ROW :", row);
       if (row) {
         const sortedRow: Absence = {
-          // id: row.id,
           date: row.date,
           employee_id: row.id!.replace("temp-", ""),
           department_id: row.department_id,
@@ -150,14 +131,6 @@ function AbsencePage() {
 
   useEffect(() => {
     if (selectedDepartment) {
-      console.log(
-        "[AbsencePage] selectedDepartment changed:",
-        selectedDepartment
-      );
-      console.log("[AbsencePage] Calling fetchAll with:", {
-        department_id: selectedDepartment,
-        date: selectedDate,
-      });
       fetchAll(selectedDepartment, selectedDate);
     }
   }, [selectedDepartment, selectedDate, fetchAll]);

@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { Absence } from "@/app/(app)/absence/input-absence/data/columns";
+import { Absence } from "@/types/absence";
 
 interface AbsenceInputTableProps {
   data: Absence[];
@@ -52,7 +52,7 @@ export function AbsenceInputTable({
   onSelectAll,
   onSearchChange,
   onDepartmentChange,
-  // onRemove,
+  onRemove,
   searchTerm = "",
   selectedDepartment = "all",
   showCheckbox = true,
@@ -63,20 +63,26 @@ export function AbsenceInputTable({
 }: AbsenceInputTableProps) {
   const inputRefs = useRef<{ [key: string]: HTMLInputElement }>({});
 
-  const departments = Array.from(new Set(data.map((item) => item.department)));
+  const departments = Array.from(
+    new Set(data.map((item) => item.department_id).filter(Boolean))
+  );
 
   const filteredData = data.filter((item) => {
     const matchesSearch =
-      item.employee_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.date.includes(searchTerm);
+      (item.employee_name?.toLowerCase().includes(searchTerm.toLowerCase()) ??
+        false) ||
+      (item.date?.includes(searchTerm) ?? false);
     const matchesDepartment =
-      selectedDepartment === "all" || item.department === selectedDepartment;
+      selectedDepartment === "all" || item.department_id === selectedDepartment;
     return matchesSearch && matchesDepartment;
   });
 
-  const allFiltered = filteredData.every((item) => selectedIds.has(item.id));
+  const allFiltered = filteredData.every(
+    (item) => item.id && selectedIds.has(item.id)
+  );
   const isIndeterminate =
-    filteredData.some((item) => selectedIds.has(item.id)) && !allFiltered;
+    filteredData.some((item) => item.id && selectedIds.has(item.id)) &&
+    !allFiltered;
 
   // Sync ref values with data updates
   useEffect(() => {
@@ -169,15 +175,15 @@ export function AbsenceInputTable({
           <TableBody>
             {filteredData.length > 0 ? (
               filteredData.map((row) => {
-                const isSelected = selectedIds.has(row.id);
+                const isSelected = row.id ? selectedIds.has(row.id) : false;
                 return (
-                  <TableRow key={row.id}>
+                  <TableRow key={row.id || "temp"}>
                     {showCheckbox && (
                       <TableCell>
                         <input
                           type="checkbox"
                           checked={isSelected}
-                          onChange={() => onCheckboxChange?.(row.id)}
+                          onChange={() => row.id && onCheckboxChange?.(row.id)}
                           className="rounded border-gray-300 cursor-pointer"
                         />
                       </TableCell>
@@ -186,13 +192,15 @@ export function AbsenceInputTable({
                     <TableCell className="text-sm">
                       {row.employee_name}
                     </TableCell>
-                    <TableCell className="text-sm">{row.department}</TableCell>
+                    <TableCell className="text-sm">
+                      {row.department_id}
+                    </TableCell>
                     <TableCell>
                       {isSelected ? (
                         <Select
                           value={row.clock_out_time}
                           onValueChange={(val) =>
-                            onEdit?.(row.id, "clock_out_time", val)
+                            row.id && onEdit?.(row.id, "clock_out_time", val)
                           }
                         >
                           <SelectTrigger className="w-full h-9">
@@ -216,12 +224,13 @@ export function AbsenceInputTable({
                       {isSelected ? (
                         <input
                           ref={(el) => {
-                            if (el)
+                            if (el && row.id)
                               inputRefs.current[`overtime-${row.id}`] = el;
                           }}
                           type="text"
                           defaultValue={row.total_overtime}
                           onChange={(e) =>
+                            row.id &&
                             onEdit?.(row.id, "total_overtime", e.target.value)
                           }
                           placeholder="Isi data"
@@ -237,12 +246,13 @@ export function AbsenceInputTable({
                       {isSelected ? (
                         <input
                           ref={(el) => {
-                            if (el) inputRefs.current[`notes-${row.id}`] = el;
+                            if (el && row.id)
+                              inputRefs.current[`notes-${row.id}`] = el;
                           }}
                           type="text"
                           defaultValue={row.notes}
                           onChange={(e) =>
-                            onEdit?.(row.id, "notes", e.target.value)
+                            row.id && onEdit?.(row.id, "notes", e.target.value)
                           }
                           placeholder="Isi data"
                           className="h-9 w-full px-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 inset-shadow-sm"
@@ -270,7 +280,7 @@ export function AbsenceInputTable({
                           </div>
                         ) : (
                           <button
-                            onClick={() => onRowEdit?.(row.id)}
+                            onClick={() => row.id && onRowEdit?.(row.id)}
                             className="text-blue-500 hover:text-blue-700 flex items-center gap-1"
                           >
                             <Edit2 className="w-4 h-4" />

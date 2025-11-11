@@ -49,9 +49,10 @@ export const useAbsenceStore = create<AbsenceState>((set) => ({
   update: async (absence: Absence) => {
     try {
       set({ loading: true });
-      const formData = {
+      const formData: Absence = {
         id: absence.id,
         date: absence.date,
+        employee_id: absence.employee_id,
         employee_name: absence.employee_name,
         department_id: absence.department_id,
         clock_out_time: absence.clock_out_time,
