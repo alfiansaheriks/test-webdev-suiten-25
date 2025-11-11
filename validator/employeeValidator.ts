@@ -35,10 +35,7 @@ export const employeeFormSchema = z.object({
       })
     )
     .nonempty("Shift harus diisi"),
-  salary_period: z
-    .string()
-    .min(1, "Periode gajian harus diisi")
-    .max(100, "Periode gajian harus kurang dari 100 karakter"),
+  salary_period: z.enum(["Daily", "Weekly", "Monthly"]),
   main_salary: z
     .string()
     .min(1, "Gaji pokok harus diisi")
@@ -75,7 +72,7 @@ export const employeeFormDefaultValues: EmployeeFormData = {
   bank_name: "",
   bank_number: "",
   shift_id: [],
-  salary_period: "",
+  salary_period: "Daily",
   main_salary: "",
   daily_salary: "",
   eat_salary: "",

@@ -60,7 +60,7 @@ function CreateEmployee() {
             : undefined,
         };
 
-        const res = await create(formData);
+        await create(formData);
       } catch (error) {
         console.error("Form submission error:", error);
       } finally {
